@@ -46,27 +46,41 @@
         </div>
 
         <script>
-          function toggleMonitor(checkbox, patientId) {
-            fetch(`/patients/${patientId}/toggle_monitor`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ on_monitor: checkbox.checked })
+        function toggleMonitor(checkbox, patientId) {
+          console.log('Toggling monitor for patient:', patientId, 'Status:', checkbox.checked);
+          
+          fetch(`/patients/${patientId}/toggle_monitor`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({ 
+              on_monitor: checkbox.checked
             })
-            .then(response => response.json())
-            .then(data => {
-              if (!data.success) {
-                checkbox.checked = !checkbox.checked;
-                alert('Ошибка обновления статуса мониторинга');
-              }
-            })
-            .catch(error => {
-              console.error('Error:', error);
+          })
+          .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Response data:', data);
+            if (!data.success) {
               checkbox.checked = !checkbox.checked;
-              alert('Ошибка сети при обновлении статуса мониторинга');
-            });
-          }
+              alert('Ошибка: ' + (data.errors || data.error || 'Unknown error'));
+            } else {
+              alert('Статус мониторинга обновлен: ' + (data.on_monitor ? 'ВКЛ' : 'ВЫКЛ'));
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            checkbox.checked = !checkbox.checked;
+            alert('Ошибка сети: ' + error.message);
+          });
+        }
         </script>
         
         <div class="row">

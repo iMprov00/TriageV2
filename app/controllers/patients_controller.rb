@@ -63,18 +63,32 @@ class PatientsController < Sinatra::Base
     @patient.destroy
     redirect '/patients'
   end
-end
 
-  # Упрощенный метод без CSRF проверки
   post '/:id/toggle_monitor' do
     content_type :json
     
-    @patient = Patient.find(params[:id])
-    if @patient.update(on_monitor: params[:on_monitor])
-      { success: true, on_monitor: @patient.on_monitor }.to_json
-    else
+    begin
+      # Парсим JSON тело запроса
+      request_body = JSON.parse(request.body.read)
+      on_monitor = request_body['on_monitor']
+      
+      @patient = Patient.find(params[:id])
+      
+      if @patient.update(on_monitor: on_monitor)
+        { success: true, on_monitor: @patient.on_monitor }.to_json
+      else
+        status 500
+        { success: false, errors: @patient.errors.full_messages }.to_json
+      end
+    rescue JSON::ParserError
+      status 400
+      { success: false, error: 'Invalid JSON' }.to_json
+    rescue ActiveRecord::RecordNotFound
+      status 404
+      { success: false, error: 'Patient not found' }.to_json
+    rescue => e
       status 500
-      { success: false, errors: @patient.errors.full_messages }.to_json
+      { success: false, error: e.message }.to_json
     end
   end
-
+end  # Конец класса - это важно!
