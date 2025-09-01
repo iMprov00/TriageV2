@@ -13,7 +13,7 @@ class AssessmentsController < Sinatra::Base
   # Создание оценки
   post '/' do
     @patient = Patient.find(params[:patient_id])
-    @assessment = @patient.assessments.new(assessment_params)
+    @assessment = @patient.assessments.new(assessment_params.merge(created_at: Time.now))
     
     if @assessment.save
       redirect "/patients/#{@patient.id}"

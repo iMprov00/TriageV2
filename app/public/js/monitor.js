@@ -38,7 +38,7 @@ class PatientMonitor {
     `;
   }
 
-  createPatientCard(patient) {
+createPatientCard(patient) {
   const timeLeft = patient.time_left;
   const isCritical = timeLeft.critical && !timeLeft.expired;
   const isExpired = timeLeft.expired;
@@ -48,45 +48,49 @@ class PatientMonitor {
 
   const timerClass = `timer ${isCritical ? 'critical' : ''} ${isExpired ? 'expired' : ''}`;
   
-  // Используем formatted время вместо ручного форматирования
-  const timeText = isExpired ? 'ВРЕМЯ ВЫШЛО' : timeLeft.formatted;
+  const timeText = isExpired ? '00:00:00' : timeLeft.formatted;
 
   const statusText = isExpired ? 'ТРЕБУЕТСЯ НЕМЕДЛЕННОЕ ВНИМАНИЕ!' :
                  isCritical ? 'КРИТИЧЕСКОЕ ВРЕМЯ!' : '';
 
   const statusClass = isExpired ? 'status expired' : 
-                   isCritical ? 'status critical' : '';
+                   isCritical ? 'status critical' : 'status';
 
   return `
     <div class="${cardClass}">
       <div class="card-header">
         <h3 class="patient-name">${patient.full_name}</h3>
-        <span class="priority-badge">Приоритет ${patient.priority}</span>
+        <span class="priority-badge priority-${patient.priority}">
+          Приоритет ${patient.priority}
+        </span>
       </div>
       
       <div class="card-body">
-        <div class="admission-time">
-          Поступление: ${new Date(patient.admission_time).toLocaleString('ru-RU')}
-        </div>
-        <div class="assessment-time">
-          Оценка: ${new Date(patient.assessment_time).toLocaleString('ru-RU')}
+        <div class="patient-info">
+          <div class="info-row">
+            <span class="info-label">Поступление:</span>
+            <span class="info-value">${patient.admission_time.replace('T', ' ').substring(0, 19)}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Оценка:</span>
+            <span class="info-value">${patient.assessment_time.replace('T', ' ').substring(0, 19)}</span>
+          </div>
         </div>
         
         <div class="timer-container">
           <div class="${timerClass}">${timeText}</div>
-          <div class="time-label">Осталось времени</div>
+          <div class="time-label">Осталось времени (ЧЧ:ММ:СС)</div>
         </div>
       </div>
 
       ${statusText ? `
         <div class="${statusClass}">
-          ${statusText}
+          ⚠️ ${statusText}
         </div>
       ` : ''}
     </div>
   `;
 }
-
   showEmptyState() {
     this.monitorElement.innerHTML = `
       <div class="empty-state">
