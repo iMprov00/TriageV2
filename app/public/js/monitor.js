@@ -56,6 +56,13 @@ createPatientCard(patient) {
   const statusClass = isExpired ? 'status expired' : 
                    isCritical ? 'status critical' : 'status';
 
+  // Функция для добавления часов к времени
+  const addHours = (dateString, hours) => {
+    const date = new Date(dateString);
+    date.setHours(date.getHours() + hours);
+    return date.toLocaleString('ru-RU');
+  };
+
   return `
     <div class="${cardClass}">
       <div class="card-header">
@@ -73,7 +80,7 @@ createPatientCard(patient) {
           </div>
           <div class="info-row">
             <span class="info-label">Оценка:</span>
-            <span class="info-value">${patient.assessment_time.replace('T', ' ').substring(0, 19)}</span>
+            <span class="info-value">${addHours(patient.assessment_time, 0)}</span>
           </div>
         </div>
         

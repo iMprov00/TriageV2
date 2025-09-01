@@ -23,7 +23,7 @@
                       <%= latest_assessment.calculate_priority %> - <%= latest_assessment.priority_description %>
                     </span>
                   </p>
-                  <p><strong>Дата оценки:</strong> <%= latest_assessment.created_at.strftime("%d.%m.%Y %H:%M") %></p>
+                  <p><strong>Дата оценки:</strong> <%= (latest_assessment.created_at + 7*3600).strftime("%d.%m.%Y %H:%M") %></p>
                 </div>
                 <div class="col-6">
                   <p><strong>ЧСС матери:</strong> <%= latest_assessment.heart_rate_mother || 'не указано' %></p>
@@ -94,39 +94,5 @@
     </div>
   </div>
   
-  <% if @patient.assessments.any? %>
-  <div class="col-6">
-    <div class="card">
-      <div class="card-header">
-        <h2 class="card-title">История оценок</h2>
-      </div>
-      <div class="card-body">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Дата оценки</th>
-              <th>Приоритет</th>
-              <th>Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @patient.assessments.each do |assessment| %>
-              <tr>
-                <td><%= assessment.created_at.strftime("%d.%m.%Y %H:%M") %></td>
-                <td>
-                  <span class="priority-badge priority-<%= assessment.calculate_priority %>">
-                    Приоритет <%= assessment.calculate_priority %>
-                  </span>
-                </td>
-                <td>
-                  <a href="#" class="btn btn-secondary">Подробнее</a>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-  <% end %>
+ 
 </div>
