@@ -1,0 +1,250 @@
+:root {
+  --main-color: #54c654;
+  --main-color-dark: #3a8a3a;
+  --secondary-color: #6c757d;
+  --info-color: #17a2b8;
+  --primary-color: #007bff;
+  --danger-color: #dc3545;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+  --text-color: #333;
+  --text-light: #fff;
+  --bg-dark: #1a1a1a;
+}
+
+.monitor-body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-light);
+  min-height: 100vh;
+}
+
+/* Контейнер мониторинга */
+.monitor-container {
+  padding: 2rem;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+/* Заголовок */
+.monitor-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.monitor-title {
+  font-size: 3rem;
+  margin: 0;
+  color: var(--text-light);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.monitor-subtitle {
+  font-size: 1.2rem;
+  color: var(--secondary-color);
+  margin: 0.5rem 0 0 0;
+}
+
+/* Сетка пациентов */
+.monitor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Карточка пациента */
+.patient-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.patient-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: currentColor;
+  opacity: 0.3;
+}
+
+.patient-card.critical {
+  animation: pulse 2s infinite;
+  border-color: var(--danger-color);
+}
+
+.patient-card.expired {
+  background: rgba(220, 53, 69, 0.2);
+  border-color: var(--danger-color);
+}
+
+/* Приоритетные цвета */
+.patient-card.priority-1 { color: var(--danger-color); }
+.patient-card.priority-2 { color: var(--warning-color); }
+.patient-card.priority-3 { color: var(--warning-color); }
+.patient-card.priority-4 { color: var(--success-color); }
+.patient-card.priority-5 { color: var(--info-color); }
+
+/* Заголовок карточки */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.patient-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+  color: var(--text-light);
+}
+
+.priority-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  background: currentColor;
+  color: white !important;
+}
+
+/* Тело карточки */
+.card-body {
+  margin-bottom: 1rem;
+}
+
+.admission-time {
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  margin-bottom: 1rem;
+}
+
+/* Таймер */
+.timer-container {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.timer {
+  font-size: 2.5rem;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  color: var(--text-light);
+  margin: 0;
+}
+
+.timer.critical {
+  color: var(--danger-color);
+  animation: blink 1s infinite;
+}
+
+.timer.expired {
+  color: var(--danger-color);
+  font-size: 1.5rem;
+}
+
+.time-label {
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  margin-top: 0.5rem;
+}
+
+/* Статус */
+.status {
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+.status.critical {
+  background: var(--danger-color);
+  color: white;
+}
+
+.status.expired {
+  background: var(--danger-color);
+  color: white;
+  animation: blink 2s infinite;
+}
+
+/* Анимации */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.5; }
+}
+
+/* Состояния загрузки и ошибок */
+.loading-state, .empty-state, .error-state {
+  text-align: center;
+  padding: 3rem;
+  grid-column: 1 / -1;
+}
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid var(--main-color);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+.empty-icon, .error-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Футер мониторинга */
+.monitor-footer {
+  text-align: center;
+  padding: 1rem;
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.last-updated {
+  margin: 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .monitor-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .monitor-title {
+    font-size: 2rem;
+  }
+  
+  .timer {
+    font-size: 2rem;
+  }
+}

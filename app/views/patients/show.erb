@@ -1,0 +1,112 @@
+<div class="row">
+  <div class="col-6">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Информация о пациенте</h2>
+      </div>
+      <div class="card-body">
+        <p><strong>ФИО:</strong> <%= @patient.full_name %></p>
+        <p><strong>Дата рождения:</strong> <%= @patient.date_of_birth %></p>
+        <p><strong>Дата поступления:</strong> <%= @patient.admission_time.strftime("%d.%m.%Y %H:%M") %></p>
+
+        <% if @patient.assessments.any? %>
+          <% latest_assessment = @patient.assessments.last %>
+          <div class="card mt-3">
+            <div class="card-header">
+              <h3>📈 Последняя оценка</h3>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-6">
+                  <p><strong>Приоритет:</strong> 
+                    <span class="priority-badge priority-<%= latest_assessment.calculate_priority %>">
+                      <%= latest_assessment.calculate_priority %> - <%= latest_assessment.priority_description %>
+                    </span>
+                  </p>
+                  <p><strong>Дата оценки:</strong> <%= latest_assessment.created_at.strftime("%d.%m.%Y %H:%M") %></p>
+                </div>
+                <div class="col-6">
+                  <p><strong>ЧСС матери:</strong> <%= latest_assessment.heart_rate_mother || 'не указано' %></p>
+                  <p><strong>АД:</strong> <%= latest_assessment.blood_pressure || 'не указано' %></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        
+        <div class="form-group">
+          <label class="form-check">
+            <input type="checkbox" 
+                   name="on_monitor" 
+                   value="true" 
+                   <%= @patient.on_monitor ? 'checked' : '' %>
+                   onchange="toggleMonitor(this, <%= @patient.id %>)">
+            Отображать на мониторе
+          </label>
+        </div>
+
+        <script>
+        function toggleMonitor(checkbox, patientId) {
+          fetch(`/patients/${patientId}/toggle_monitor`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': '<%= csrf_token %>'
+            },
+            body: JSON.stringify({ on_monitor: checkbox.checked })
+          }).then(response => {
+            if (!response.ok) {
+              checkbox.checked = !checkbox.checked;
+              alert('Ошибка обновления статуса мониторинга');
+            }
+          });
+        }
+        </script>
+        
+        <div class="row">
+          <div class="col">
+            <a href="/patients/<%= @patient.id %>/edit" class="btn">Редактировать</a>
+            <a href="/assessments/new?patient_id=<%= @patient.id %>" class="btn">Добавить оценку</a>
+            <a href="/patients" class="btn btn-secondary">Назад к списку</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <% if @patient.assessments.any? %>
+  <div class="col-6">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">История оценок</h2>
+      </div>
+      <div class="card-body">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Дата оценки</th>
+              <th>Приоритет</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @patient.assessments.each do |assessment| %>
+              <tr>
+                <td><%= assessment.created_at.strftime("%d.%m.%Y %H:%M") %></td>
+                <td>
+                  <span class="priority-badge priority-<%= assessment.calculate_priority %>">
+                    Приоритет <%= assessment.calculate_priority %>
+                  </span>
+                </td>
+                <td>
+                  <a href="#" class="btn btn-secondary">Подробнее</a>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <% end %>
+</div>

@@ -57,3 +57,6 @@ build-iPhoneSimulator/
 
 db/development.sqlite3
 db/schema.rb
+development.sqlite3
+db/development.sqlite3-wal
+db/development.sqlite3-shm
