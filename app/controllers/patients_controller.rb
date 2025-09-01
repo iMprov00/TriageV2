@@ -2,6 +2,7 @@ class PatientsController < Sinatra::Base
   configure do
     set :views, 'app/views/patients'
     set :method_override, true
+    set :protection, except: [:authenticity_token] # Отключаем проверку CSRF
   end
 
   # Список всех пациентов
@@ -64,12 +65,16 @@ class PatientsController < Sinatra::Base
   end
 end
 
-post '/:id/toggle_monitor' do
-  @patient = Patient.find(params[:id])
-  if @patient.update(on_monitor: params[:on_monitor])
-    status 200
-  else
-    status 500
+  # Упрощенный метод без CSRF проверки
+  post '/:id/toggle_monitor' do
+    content_type :json
+    
+    @patient = Patient.find(params[:id])
+    if @patient.update(on_monitor: params[:on_monitor])
+      { success: true, on_monitor: @patient.on_monitor }.to_json
+    else
+      status 500
+      { success: false, errors: @patient.errors.full_messages }.to_json
+    end
   end
-end
 
