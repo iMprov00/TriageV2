@@ -39,50 +39,53 @@ class PatientMonitor {
   }
 
   createPatientCard(patient) {
-    const timeLeft = patient.time_left;
-    const isCritical = timeLeft.critical && !timeLeft.expired;
-    const isExpired = timeLeft.expired;
-    
-    const cardClass = `patient-card priority-${patient.priority} ${
-      isCritical ? 'critical' : ''} ${isExpired ? 'expired' : ''}`;
+  const timeLeft = patient.time_left;
+  const isCritical = timeLeft.critical && !timeLeft.expired;
+  const isExpired = timeLeft.expired;
+  
+  const cardClass = `patient-card priority-${patient.priority} ${
+    isCritical ? 'critical' : ''} ${isExpired ? 'expired' : ''}`;
 
-    const timerClass = `timer ${isCritical ? 'critical' : ''} ${isExpired ? 'expired' : ''}`;
-    
-    const timeText = isExpired ? 'ВРЕМЯ ВЫШЛО' : 
-      `${timeLeft.minutes.toString().padStart(2, '0')}:${timeLeft.seconds.toString().padStart(2, '0')}`;
+  const timerClass = `timer ${isCritical ? 'critical' : ''} ${isExpired ? 'expired' : ''}`;
+  
+  // Используем formatted время вместо ручного форматирования
+  const timeText = isExpired ? 'ВРЕМЯ ВЫШЛО' : timeLeft.formatted;
 
-    const statusText = isExpired ? 'ТРЕБУЕТСЯ НЕМЕДЛЕННОЕ ВНИМАНИЕ!' :
-                   isCritical ? 'КРИТИЧЕСКОЕ ВРЕМЯ!' : '';
+  const statusText = isExpired ? 'ТРЕБУЕТСЯ НЕМЕДЛЕННОЕ ВНИМАНИЕ!' :
+                 isCritical ? 'КРИТИЧЕСКОЕ ВРЕМЯ!' : '';
 
-    const statusClass = isExpired ? 'status expired' : 
-                     isCritical ? 'status critical' : '';
+  const statusClass = isExpired ? 'status expired' : 
+                   isCritical ? 'status critical' : '';
 
-    return `
-      <div class="${cardClass}">
-        <div class="card-header">
-          <h3 class="patient-name">${patient.full_name}</h3>
-          <span class="priority-badge">Приоритет ${patient.priority}</span>
+  return `
+    <div class="${cardClass}">
+      <div class="card-header">
+        <h3 class="patient-name">${patient.full_name}</h3>
+        <span class="priority-badge">Приоритет ${patient.priority}</span>
+      </div>
+      
+      <div class="card-body">
+        <div class="admission-time">
+          Поступление: ${new Date(patient.admission_time).toLocaleString('ru-RU')}
+        </div>
+        <div class="assessment-time">
+          Оценка: ${new Date(patient.assessment_time).toLocaleString('ru-RU')}
         </div>
         
-        <div class="card-body">
-          <div class="admission-time">
-            Поступление: ${new Date(patient.admission_time).toLocaleString('ru-RU')}
-          </div>
-          
-          <div class="timer-container">
-            <div class="${timerClass}">${timeText}</div>
-            <div class="time-label">Осталось времени</div>
-          </div>
+        <div class="timer-container">
+          <div class="${timerClass}">${timeText}</div>
+          <div class="time-label">Осталось времени</div>
         </div>
-
-        ${statusText ? `
-          <div class="${statusClass}">
-            ${statusText}
-          </div>
-        ` : ''}
       </div>
-    `;
-  }
+
+      ${statusText ? `
+        <div class="${statusClass}">
+          ${statusText}
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
 
   showEmptyState() {
     this.monitorElement.innerHTML = `

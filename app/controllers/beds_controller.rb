@@ -23,7 +23,7 @@ class BedsController < Sinatra::Base
         admission_time: patient.admission_time.iso8601,
         priority: latest_assessment.calculate_priority,
         assessment_time: latest_assessment.created_at.iso8601,
-        time_left: calculate_time_left(patient.admission_time, latest_assessment.calculate_priority)
+        time_left: calculate_time_left(latest_assessment.created_at, latest_assessment.calculate_priority)
       }
     end.compact
     
@@ -32,25 +32,35 @@ class BedsController < Sinatra::Base
 
   private
 
-  def calculate_time_left(admission_time, priority)
-    priority_times = {
-      1 => 15 * 60,  # 15 минут в секундах
-      2 => 30 * 60,  # 30 минут в секундах
-      3 => 60 * 60,  # 60 минут в секундах
-      4 => 120 * 60, # 120 минут в секундах
-      5 => 240 * 60  # 240 минут в секундах
-    }
+def calculate_time_left(assessment_time, priority)
+  puts "=== TIME CALCULATION DEBUG ==="
+  puts "Assessment time: #{assessment_time}"
+  puts "Current time: #{Time.now}"
+  puts "Priority: #{priority}"
+  
+  priority_times = {
+    1 => 5 * 60,    2 => 15 * 60,   3 => 60 * 60,
+    4 => 120 * 60,  5 => 240 * 60
+  }
 
-    time_allowed = priority_times[priority] || 240 * 60
-    time_elapsed = Time.now - admission_time
-    time_left_seconds = [time_allowed - time_elapsed, 0].max
+  time_allowed = priority_times[priority] || 240 * 60
+  time_elapsed = Time.now - assessment_time
+  time_left_seconds = [time_allowed - time_elapsed, 0].max
 
-    {
-      total_seconds: time_left_seconds.to_i,
-      minutes: (time_left_seconds / 60).to_i,
-      seconds: (time_left_seconds % 60).to_i,
-      critical: time_left_seconds < 300, # 5 минут - критическое время
-      expired: time_left_seconds == 0
-    }
-  end
+  puts "Time allowed: #{time_allowed} seconds"
+  puts "Time elapsed: #{time_elapsed} seconds"  
+  puts "Time left: #{time_left_seconds} seconds"
+  
+  minutes = (time_left_seconds / 60).to_i
+  seconds = (time_left_seconds % 60).to_i
+
+  {
+    total_seconds: time_left_seconds.to_i,
+    minutes: minutes,
+    seconds: seconds,
+    formatted: "#{minutes}:#{seconds.to_s.rjust(2, '0')}",
+    critical: time_left_seconds <= 300 && time_left_seconds > 0,
+    expired: time_left_seconds == 0
+  }
+end
 end
