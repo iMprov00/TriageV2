@@ -1,16 +1,48 @@
-<div class="row">
-  <div class="col">
+<% @title = "Добро пожаловать в систему MFTI" %>
+
+<div class="row justify-content-center">
+  <div class="col-lg-10">
     <div class="card">
       <div class="card-header">
-        <h2 class="card-title">Добро пожаловать в систему MFTI</h2>
+        <h4 class="mb-0">
+          <i class="bi bi-heart-pulse"></i> Добро пожаловать в систему MFTI
+        </h4>
       </div>
       <div class="card-body">
-        <p>Система для определения приоритета пациентов по шкале Maternal Fetal Triage Index (MFTI).</p>
-        <div class="row">
-          <div class="col">
-            <a href="/patients/new" class="btn">Добавить пациента</a>
-            <a href="/beds" class="btn btn-secondary">Мониторинг</a>
+        <p class="lead">Система для определения приоритета пациентов по шкале Maternal Fetal Triage Index (MFTI).</p>
+        
+        <div class="row mt-4">
+          <div class="col-md-6 mb-3">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <i class="bi bi-person-plus" style="font-size: 3rem; color: var(--main-color);"></i>
+                <h5>Добавление пациентов</h5>
+                <p>Быстрое добавление новых пациентов в систему</p>
+                <a href="/patients/new" class="btn btn-main mt-2">
+                  <i class="bi bi-person-plus"></i> Добавить пациента
+                </a>
+              </div>
+            </div>
           </div>
+          
+          <div class="col-md-6 mb-3">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <i class="bi bi-display" style="font-size: 3rem; color: var(--info-color);"></i>
+                <h5>Мониторинг</h5>
+                <p>Отслеживание состояния пациентов в реальном времени</p>
+                <a href="/beds" class="btn btn-main mt-2">
+                  <i class="bi bi-display"></i> Перейти к мониторингу
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="text-center mt-4">
+          <a href="/patients" class="btn btn-secondary">
+            <i class="bi bi-list-ul"></i> Список всех пациентов
+          </a>
         </div>
       </div>
     </div>

@@ -1,18 +1,21 @@
-<% @title = "Добавление нового пациента" %>
+<% @title = "Редактирование пациента" %>
 
 <div class="row justify-content-center">
   <div class="col-lg-8">
     <div class="card">
       <div class="card-header">
-        <h4 class="mb-0"><i class="bi bi-person-plus"></i> Добавление нового пациента</h4>
+        <h4 class="mb-0"><i class="bi bi-pencil"></i> Редактирование пациента</h4>
       </div>
       <div class="card-body">
-        <form action="/patients" method="post" id="patientForm">
+        <form action="/patients/<%= @patient.id %>" method="post" id="patientForm">
+          <input type="hidden" name="_method" value="put">
+          
           <div class="row">
             <div class="col-md-6 mb-3">
               <div class="form-group">
                 <label for="full_name" class="form-label">ФИО пациента</label>
                 <input type="text" id="full_name" name="full_name" class="form-control" required 
+                       value="<%= @patient.full_name %>"
                        placeholder="Введите полное имя">
               </div>
             </div>
@@ -21,6 +24,7 @@
               <div class="form-group">
                 <label for="date_of_birth" class="form-label">Дата рождения</label>
                 <input type="text" id="date_of_birth" name="date_of_birth" class="form-control" 
+                       value="<%= @patient.date_of_birth_formatted %>"
                        placeholder="дд.мм.гггг" required
                        pattern="\d{2}\.\d{2}\.\d{4}"
                        title="Введите дату в формате дд.мм.гггг">
@@ -34,6 +38,7 @@
               <div class="form-group">
                 <label for="admission_time" class="form-label">Дата и время поступления</label>
                 <input type="text" id="admission_time" name="admission_time" class="form-control" 
+                       value="<%= @patient.admission_time.strftime('%d.%m.%Y %H:%M') %>"
                        placeholder="дд.мм.гггг чч:мм" required
                        pattern="\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}"
                        title="Введите дату и время в формате дд.мм.гггг чч:мм">
@@ -45,9 +50,9 @@
           <div class="row mt-4">
             <div class="col">
               <button type="submit" class="btn btn-main">
-                <i class="bi bi-person-plus"></i> Добавить пациента
+                <i class="bi bi-check-lg"></i> Сохранить изменения
               </button>
-              <a href="/patients" class="btn btn-secondary">
+              <a href="/patients/<%= @patient.id %>" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Отмена
               </a>
             </div>

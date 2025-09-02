@@ -1,31 +1,36 @@
+<% @title = "Информация о пациенте" %>
+
 <div class="row">
-  <div class="col-6">
+  <div class="col-lg-8">
     <div class="card">
       <div class="card-header">
-        <h2 class="card-title">Информация о пациенте</h2>
+        <h4 class="mb-0"><i class="bi bi-person"></i> Информация о пациенте</h4>
       </div>
       <div class="card-body">
-        <p><strong>ФИО:</strong> <%= @patient.full_name %></p>
-        <p><strong>Дата рождения:</strong> <%= @patient.date_of_birth %></p>
-        <p><strong>Дата поступления:</strong> <%= @patient.admission_time.strftime("%d.%m.%Y %H:%M") %></p>
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>ФИО:</strong> <%= @patient.full_name %></p>
+            <p><strong>Дата рождения:</strong> <%= @patient.date_of_birth %></p>
+            <p><strong>Дата поступления:</strong> <%= @patient.admission_time.strftime("%d.%m.%Y %H:%M") %></p>
+          </div>
+        </div>
 
         <% if @patient.assessments.any? %>
           <% latest_assessment = @patient.assessments.last %>
-          <div class="card mt-3">
-            <div class="card-header">
-              <h3>📈 Последняя оценка</h3>
+          <div class="card mt-4">
+            <div class="card-header card-header-green">
+              <h5 class="mb-0"><i class="bi bi-graph-up"></i> Последняя оценка</h5>
             </div>
             <div class="card-body">
               <div class="row">
-                <div class="col-6">
-                  <p><strong>Приоритет:</strong> 
-                    <span class="priority-badge priority-<%= latest_assessment.calculate_priority %>">
-                      <%= latest_assessment.calculate_priority %> - <%= latest_assessment.priority_description %>
-                    </span>
-                  </p>
-                  <p><strong>Дата оценки:</strong> <%= (latest_assessment.created_at + 7*3600).strftime("%d.%m.%Y %H:%M") %></p>
+                <div class="col-md-6">
+                  <p><strong>Приоритет:</strong></p>
+                  <span class="priority-badge priority-<%= latest_assessment.calculate_priority %>">
+                    <%= latest_assessment.calculate_priority %> - <%= latest_assessment.priority_description %>
+                  </span>
+                  <p class="mt-2"><strong>Дата оценки:</strong> <%= (latest_assessment.created_at + 7*3600).strftime("%d.%m.%Y %H:%M") %></p>
                 </div>
-                <div class="col-6">
+                <div class="col-md-6">
                   <p><strong>ЧСС матери:</strong> <%= latest_assessment.heart_rate_mother || 'не указано' %></p>
                   <p><strong>АД:</strong> <%= latest_assessment.blood_pressure || 'не указано' %></p>
                 </div>
@@ -34,65 +39,136 @@
           </div>
         <% end %>
         
-        <div class="form-group">
-          <label class="form-check">
+        <div class="form-group mt-4">
+          <div class="form-check form-switch">
             <input type="checkbox" 
+                   class="form-check-input" 
+                   id="monitor-toggle"
                    name="on_monitor" 
                    value="true" 
                    <%= @patient.on_monitor ? 'checked' : '' %>
                    onchange="toggleMonitor(this, <%= @patient.id %>)">
-            Отображать на мониторе
-          </label>
+            <label class="form-check-label" for="monitor-toggle">
+              <strong>Отображать на мониторе</strong>
+            </label>
+          </div>
         </div>
 
-        <script>
-        function toggleMonitor(checkbox, patientId) {
-          console.log('Toggling monitor for patient:', patientId, 'Status:', checkbox.checked);
-          
-          fetch(`/patients/${patientId}/toggle_monitor`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify({ 
-              on_monitor: checkbox.checked
-            })
-          })
-          .then(response => {
-            console.log('Response status:', response.status);
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log('Response data:', data);
-            if (!data.success) {
-              checkbox.checked = !checkbox.checked;
-              alert('Ошибка: ' + (data.errors || data.error || 'Unknown error'));
-            } else {
-              alert('Статус мониторинга обновлен: ' + (data.on_monitor ? 'ВКЛ' : 'ВЫКЛ'));
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            checkbox.checked = !checkbox.checked;
-            alert('Ошибка сети: ' + error.message);
-          });
-        }
-        </script>
-        
-        <div class="row">
+        <div class="row mt-4">
           <div class="col">
-            <a href="/patients/<%= @patient.id %>/edit" class="btn">Редактировать</a>
-            <a href="/assessments/new?patient_id=<%= @patient.id %>" class="btn">Добавить оценку</a>
-            <a href="/patients" class="btn btn-secondary">Назад к списку</a>
+            <div class="btn-group-vertical btn-group-lg" role="group" style="gap: 12px;">
+              <a href="/patients/<%= @patient.id %>/edit" class="btn btn-outline-primary" >
+                <i class="bi bi-pencil"></i> Редактировать
+              </a>
+              <a href="/assessments/new?patient_id=<%= @patient.id %>" class="btn btn-main">
+                <i class="bi bi-plus-circle"></i> Добавить оценку
+              </a>
+              <a href="/patients" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Назад к списку
+              </a>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  
- 
 </div>
+
+<script>
+function toggleMonitor(checkbox, patientId) {
+  const isChecked = checkbox.checked;
+  
+  fetch(`/patients/${patientId}/toggle_monitor`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({ on_monitor: isChecked })
+  })
+  .then(response => {
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return response.json();
+  })
+  .then(data => {
+    if (!data.success) {
+      checkbox.checked = !isChecked;
+      alert('Ошибка: ' + (data.errors || data.error || 'Unknown error'));
+    } else {
+      showNotification('Статус мониторинга обновлен: ' + (data.on_monitor ? 'ВКЛ' : 'ВЫКЛ'));
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    checkbox.checked = !isChecked;
+    alert('Ошибка сети: ' + error.message);
+  });
+}
+
+function showNotification(message) {
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--main-color);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  `;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+</script>
+
+<style>
+/* Стили для зеленых заголовков */
+.card-header-green {
+  background: linear-gradient(135deg, var(--main-color) 0%, var(--main-color-dark) 100%) !important;
+  color: white !important;
+  border-bottom: none;
+}
+
+/* Улучшенные стили для кнопок */
+.btn-group-vertical {
+  width: 100%;
+}
+
+.btn-group-vertical .btn {
+  border-radius: 8px !important;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-outline-primary {
+  border: 2px solid var(--main-color) !important;
+  color: var(--main-color) !important;
+  background: transparent !important;
+}
+
+.btn-outline-primary:hover {
+  background: var(--main-color) !important;
+  color: white !important;
+}
+
+/* Адаптивность для планшетов */
+@media (max-width: 768px) {
+  .btn-group-vertical .btn {
+    min-height: 60px;
+    font-size: 18px;
+  }
+}
+</style>
