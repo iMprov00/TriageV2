@@ -13,6 +13,7 @@
                 <th>ФИО</th>
                 <th>Дата рождения</th>
                 <th>Дата поступления</th>
+                <th>Мониторинг</th>
                 <th>Действия</th>
               </tr>
             </thead>
@@ -22,6 +23,15 @@
                   <td><%= patient.full_name %></td>
                   <td><%= patient.date_of_birth %></td>
                   <td><%= patient.admission_time.strftime("%d.%m.%Y %H:%M") %></td>
+                  <td>
+                    <div class="form-check">
+                      <input type="checkbox" 
+                             class="form-check-input monitor-checkbox" 
+                             data-patient-id="<%= patient.id %>"
+                             <%= 'checked' if patient.on_monitor %>>
+                      <label class="form-check-label">На мониторе</label>
+                    </div>
+                  </td>
                   <td>
                     <a href="/patients/<%= patient.id %>" class="btn btn-secondary">Просмотр</a>
                     <a href="/patients/<%= patient.id %>/edit" class="btn">Редактировать</a>
@@ -41,3 +51,47 @@
     </div>
   </div>
 </div>
+
+<!-- Добавить JavaScript для обработки чекбоксов -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const checkboxes = document.querySelectorAll('.monitor-checkbox');
+  
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      const patientId = this.dataset.patientId;
+      const isChecked = this.checked;
+      
+      // Отправить AJAX запрос на сервер
+      fetch(`/patients/${patientId}/toggle_monitor`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ on_monitor: isChecked })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (!data.success) {
+          // В случае ошибки вернуть чекбокс в предыдущее состояние
+          this.checked = !isChecked;
+          alert('Ошибка при обновлении: ' + (data.errors || data.error || 'Unknown error'));
+        } else {
+          console.log('Мониторинг обновлен для пациента', patientId, 'Статус:', data.on_monitor);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        this.checked = !isChecked;
+        alert('Произошла ошибка при обновлении: ' + error.message);
+      });
+    });
+  });
+});
+</script>

@@ -64,6 +64,7 @@ class PatientsController < Sinatra::Base
     redirect '/patients'
   end
 
+  # Эндпоинт для переключения мониторинга
   post '/:id/toggle_monitor' do
     content_type :json
     
