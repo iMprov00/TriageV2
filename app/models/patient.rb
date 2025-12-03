@@ -4,6 +4,7 @@ class Patient < ActiveRecord::Base
   validates :full_name, presence: true
   validates :admission_time, presence: true
   validates :date_of_birth, presence: true
+  validates :on_monitor, inclusion: { in: [true, false] }
   
   # Последняя оценка пациента
   def latest_assessment
@@ -27,12 +28,22 @@ class Patient < ActiveRecord::Base
 
   # Время поступления в формате для отображения
   def admission_time_formatted
-    admission_time.strftime("%H:%M:%S")
+    admission_time&.strftime("%H:%M:%S") || "N/A"
   end
 
   # Дата рождения в формате для отображения
   def date_of_birth_formatted
-    date_of_birth.strftime("%d.%m.%Y")
+    date_of_birth&.strftime("%d.%m.%Y") || "N/A"
+  end
+  
+  # Проверка, находится ли пациент на мониторинге
+  def on_monitor?
+    on_monitor == true
+  end
+  
+  # Переключение статуса мониторинга
+  def toggle_monitor!
+    update!(on_monitor: !on_monitor)
   end
   
   # Для JSON представления (для динамического обновления)
@@ -46,6 +57,7 @@ class Patient < ActiveRecord::Base
       priority_color: priority_color,
       time_remaining: time_remaining,
       assessment_time: latest_assessment&.created_at_formatted,
+      on_monitor: on_monitor,
       created_at: created_at
     }.to_json(options)
   end
